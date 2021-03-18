@@ -32,12 +32,25 @@ void vTask2_cmd_handling(void *params);
 void vTask3_cmd_processing(void *params);
 void vTask4_uart_write(void *params);
 
+//Task handles
 TaskHandle_t xTaskHandle1 = NULL;
 TaskHandle_t xTaskHandle2 = NULL;
 TaskHandle_t xTaskHandle3 = NULL;
 TaskHandle_t xTaskHandle4 = NULL;
 
+//Queue handle
+QueueHandle_t command_queue = NULL;
+
 void rtos_delay(uint32_t delay_in_ms);
+
+//command structure
+typedef struct APP_CMD{
+
+	uint8_t	COMMAND_NUM;
+	uint8_t	COMMAND_ARGS[10];
+}APP_CMD_t;
+
+
 
 int main(void)
 {
@@ -51,37 +64,48 @@ int main(void)
 
 	prvSetupHardware();
 
-	sprintf(usr_msg, "Demo of notify task\r\n");
+	sprintf(usr_msg, "Demo of Queue program \r\n");
 	printmsg(usr_msg);
 
-	//Create tasks
-	xTaskCreate(vTask1_menu_display,
-				"Menu display",
-				500,
-				NULL,
-				2,
-				&xTaskHandle1);
+	//Create the command queue
+	command_queue = xQueueCreate(10, sizeof(APP_CMD_t*));
 
-	xTaskCreate(vTask2_cmd_handling,
-				"CMD handling",
-				500,
-				NULL,
-				2,
-				&xTaskHandle2);
+	if ( command_queue != NULL){
 
-	xTaskCreate(vTask3_cmd_processing,
-				"CMD processing",
-				500,
-				NULL,
-				2,
-				&xTaskHandle3);
+		//Create tasks
+		xTaskCreate(vTask1_menu_display,
+					"Menu display",
+					500,
+					NULL,
+					1,
+					&xTaskHandle1);
 
-	xTaskCreate(vTask4_uart_write,
-				"UART_write",
-				500,
-				NULL,
-				2,
-				&xTaskHandle4);
+		xTaskCreate(vTask2_cmd_handling,
+					"CMD handling",
+					500,
+					NULL,
+					1,
+					&xTaskHandle2);
+
+		xTaskCreate(vTask3_cmd_processing,
+					"CMD processing",
+					500,
+					NULL,
+					1,
+					&xTaskHandle3);
+
+		xTaskCreate(vTask4_uart_write,
+					"UART_write",
+					500,
+					NULL,
+					1,
+					&xTaskHandle4);
+
+	}else{
+
+		sprintf(usr_msg, "Queue creation failed\r\n");
+		printmsg(usr_msg);
+	}
 
 	//Start scheduler
 	vTaskStartScheduler();
@@ -91,18 +115,30 @@ int main(void)
 
 void vTask1_menu_display(void *params){
 
+	while(1){
+
+	}
 }
 
 void vTask2_cmd_handling(void *params){
 
+	while(1){
+
+	}
 }
 
 void vTask3_cmd_processing(void *params){
 
+	while(1){
+
+	}
 }
 
 void vTask4_uart_write(void *params){
 
+	while(1){
+
+	}
 }
 
 void rtos_delay(uint32_t delay_in_ms){
