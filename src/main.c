@@ -133,8 +133,14 @@ int main(void)
 
 void vTask1_menu_display(void *params){
 
+	char *pData = menu;
+
 	while(1){
 
+		xQueueSend(uart_write_queue, &pData, portMAX_DELAY);
+
+		//wait until someone notifies
+		xTaskNotifyWait(0, 0, NULL, portMAX_DELAY);
 	}
 }
 
