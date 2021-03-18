@@ -57,7 +57,6 @@ char menu[] = {"\
 \r\nLED_TOGGLE				--->3\
 \r\nLED_TOGGLE_OFF			--->4\
 \r\nLED_READ_STATTUS		--->5\
-\r\nLRTC_PRINT_DATETIME		--->6\
 \r\nEXIT_APP				--->0\
 \r\nType your option here		"};
 
@@ -66,7 +65,6 @@ char menu[] = {"\
 #define LED_TOGGLE_COMMAND	3
 #define LED_TOGGLE_STOP		4
 #define LED_READ_STATUS		5
-#define RTC_READ_DATE_TIME	6
 
 
 //command structure
@@ -83,7 +81,6 @@ void make_led_off(void);
 void led_toggle_start(uint32_t duration);
 void led_toggle_stop(void);
 void read_led_status(char *task_msg);
-void read_rtc_info(char *task_msg);
 void print_error_msg(char *task_msg);
 
 //software timer callback function
@@ -179,10 +176,13 @@ void vTask2_cmd_handling(void *params){
 
 		xTaskNotifyWait(0, 0, NULL, portMAX_DELAY);
 		//1. send command to queue
-		command_code = getCommandCode(command_buffer);
 		new_cmd = (APP_CMD_t*) pvPortMalloc(sizeof(APP_CMD_t));
+
+		taskENTER_CRITICAL();
+		command_code = getCommandCode(command_buffer);
 		new_cmd->COMMAND_NUM = command_code;
 		getArguments(new_cmd->COMMAND_ARGS);
+		taskEXIT_CRITICAL();
 
 		//Send the command to the command queue
 		xQueueSend(command_queue, &new_cmd, portMAX_DELAY);
@@ -222,14 +222,13 @@ void vTask3_cmd_processing(void *params){
 
 			read_led_status(task_msg);
 
-		}else if(new_cmd->COMMAND_NUM == RTC_READ_DATE_TIME){
-
-			read_rtc_info(task_msg);
-
 		}else{
 
 			print_error_msg(task_msg);
 		}
+
+		//free the allocated memory
+		vPortFree(new_cmd);
 	}
 }
 
@@ -275,11 +274,6 @@ void read_led_status(char *task_msg){
 
 	sprintf(task_msg, "\r\nLED status is: %d\r\n", GPIO_ReadOutputDataBit(GPIOA, GPIO_Pin_5));
 	xQueueSend(uart_write_queue, &task_msg, portMAX_DELAY);
-}
-
-void read_rtc_info(char *task_msg){
-
-
 }
 
 void print_error_msg(char *task_msg){
