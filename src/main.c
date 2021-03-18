@@ -47,6 +47,9 @@ void rtos_delay(uint32_t delay_in_ms);
 uint8_t command_buffer[20];
 uint8_t command_len = 0;
 
+uint8_t getCommandCode(uint8_t *buffer);
+void getArguments(uint8_t *buffer);
+
 //Menu
 char menu[] = {"\
 \r\nLED_ON					--->1\
@@ -58,6 +61,14 @@ char menu[] = {"\
 \r\nEXIT_APP				--->0\
 \r\nType your option here		"};
 
+#define LED_ON_COMMAND		1
+#define LED_OFF_COMMAND		2
+#define LED_TOGGLE_COMMAND	3
+#define LED_TOGGLE_STOP		4
+#define LED_READ_STATUS		5
+#define RTC_READ_DATE_TIME	6
+
+
 //command structure
 typedef struct APP_CMD{
 
@@ -65,6 +76,15 @@ typedef struct APP_CMD{
 	uint8_t	COMMAND_ARGS[10];
 }APP_CMD_t;
 
+
+//helper functions
+void make_led_on(void);
+void make_led_off(void);
+void led_toggle_start(void);
+void led_toggle_stop(void);
+void read_led_status(char *task_msg);
+void read_rtc_info(char *task_msg);
+void print_error_msg(char *task_msg);
 
 
 int main(void)
@@ -79,7 +99,7 @@ int main(void)
 
 	prvSetupHardware();
 
-	sprintf(usr_msg, "Demo of Queue program \r\n");
+	sprintf(usr_msg, "\r\nDemo of Queue program \r\n");
 	printmsg(usr_msg);
 
 	//Create the command queue
@@ -141,21 +161,106 @@ void vTask1_menu_display(void *params){
 
 		//wait until someone notifies
 		xTaskNotifyWait(0, 0, NULL, portMAX_DELAY);
+
 	}
 }
 
 void vTask2_cmd_handling(void *params){
 
+	uint8_t command_code = 0;
+	APP_CMD_t *new_cmd;
+
 	while(1){
+
+		xTaskNotifyWait(0, 0, NULL, portMAX_DELAY);
+		//1. send command to queue
+		command_code = getCommandCode(command_buffer);
+		new_cmd = (APP_CMD_t*) pvPortMalloc(sizeof(APP_CMD_t));
+		new_cmd->COMMAND_NUM = command_code;
+		getArguments(new_cmd->COMMAND_ARGS);
+
+		//Send the command to the command queue
+		xQueueSend(command_queue, &new_cmd, portMAX_DELAY);
 
 	}
 }
 
+
 void vTask3_cmd_processing(void *params){
+
+	APP_CMD_t *new_cmd;
+	uint8_t task_msg[50];
 
 	while(1){
 
+		xQueueReceive(command_queue, (void*)&new_cmd, portMAX_DELAY);
+
+		if(new_cmd->COMMAND_NUM == LED_ON_COMMAND){
+
+			make_led_on();
+
+		}else if(new_cmd->COMMAND_NUM == LED_OFF_COMMAND){
+
+			make_led_off();
+
+		}else if(new_cmd->COMMAND_NUM == LED_TOGGLE_COMMAND){
+
+			led_toggle_start();
+
+		}else if(new_cmd->COMMAND_NUM == LED_TOGGLE_STOP){
+
+			led_toggle_stop();
+
+		}else if(new_cmd->COMMAND_NUM == LED_READ_STATUS){
+
+			read_led_status(task_msg);
+
+		}else if(new_cmd->COMMAND_NUM == RTC_READ_DATE_TIME){
+
+			read_rtc_info(task_msg);
+
+		}else{
+
+			print_error_msg(task_msg);
+		}
 	}
+}
+
+void make_led_on(void){
+
+	GPIO_WriteBit(GPIOA, GPIO_Pin_5, Bit_SET);
+}
+
+void make_led_off(void){
+
+	GPIO_WriteBit(GPIOA, GPIO_Pin_5, Bit_RESET);
+}
+
+void led_toggle_start(void){
+
+
+}
+
+void led_toggle_stop(void){
+
+
+}
+
+void read_led_status(char *task_msg){
+
+	sprintf(task_msg, "\r\nLED status is: %d\r\n", GPIO_ReadOutputDataBit(GPIOA, GPIO_Pin_5));
+	xQueueSend(uart_write_queue, &task_msg, portMAX_DELAY);
+}
+
+void read_rtc_info(char *task_msg){
+
+
+}
+
+void print_error_msg(char *task_msg){
+
+	sprintf(task_msg, "\r\nInvalid command\r\n");
+	xQueueSend(uart_write_queue, &task_msg, portMAX_DELAY);
 }
 
 void vTask4_uart_write(void *params){
@@ -178,11 +283,11 @@ void rtos_delay(uint32_t delay_in_ms){
 
 }
 
-
-
 void USART2_IRQHandler(void){
 
 	uint16_t data_byte;
+	BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+
 	if( USART_GetFlagStatus(USART2, USART_FLAG_RXNE)){
 
 		//a data byte is received from the user
@@ -192,9 +297,19 @@ void USART2_IRQHandler(void){
 
 		if(data_byte == '\r'){
 
+			// reset the command len
+			command_len = 0;
+
 			//notify the command handling task
-			xTaskNotify(xTaskHandle2, 0, eNoAction);
+			xTaskNotifyFromISR(xTaskHandle2, 0, eNoAction, &xHigherPriorityTaskWoken);
+
+			xTaskNotifyFromISR(xTaskHandle1, 0, eNoAction, &xHigherPriorityTaskWoken);
 		}
+	}
+
+	if(xHigherPriorityTaskWoken){
+
+		taskYIELD();
 	}
 }
 
@@ -205,6 +320,15 @@ static void prvSetupHardware(void){
 
 	//Setup UART
 	prvSetupUart();
+
+}
+
+uint8_t getCommandCode(uint8_t *buffer){
+
+	return buffer[0] - 48;
+}
+
+void getArguments(uint8_t *buffer){
 
 }
 
