@@ -80,12 +80,17 @@ typedef struct APP_CMD{
 //helper functions
 void make_led_on(void);
 void make_led_off(void);
-void led_toggle_start(void);
+void led_toggle_start(uint32_t duration);
 void led_toggle_stop(void);
 void read_led_status(char *task_msg);
 void read_rtc_info(char *task_msg);
 void print_error_msg(char *task_msg);
 
+//software timer callback function
+void led_toggle(TimerHandle_t xTimer);
+
+//software timer handler
+TimerHandle_t led_timer_handle = NULL;
 
 int main(void)
 {
@@ -191,6 +196,8 @@ void vTask3_cmd_processing(void *params){
 	APP_CMD_t *new_cmd;
 	uint8_t task_msg[50];
 
+	uint32_t toggle_duration = pdMS_TO_TICKS(500);
+
 	while(1){
 
 		xQueueReceive(command_queue, (void*)&new_cmd, portMAX_DELAY);
@@ -205,7 +212,7 @@ void vTask3_cmd_processing(void *params){
 
 		}else if(new_cmd->COMMAND_NUM == LED_TOGGLE_COMMAND){
 
-			led_toggle_start();
+			led_toggle_start(toggle_duration);
 
 		}else if(new_cmd->COMMAND_NUM == LED_TOGGLE_STOP){
 
@@ -236,14 +243,32 @@ void make_led_off(void){
 	GPIO_WriteBit(GPIOA, GPIO_Pin_5, Bit_RESET);
 }
 
-void led_toggle_start(void){
+void led_toggle(TimerHandle_t xTimer){
 
+	GPIO_ToggleBits(GPIOA, GPIO_Pin_5);
+}
 
+void led_toggle_start(uint32_t duration){
+
+	if(led_timer_handle == NULL){
+
+		//create software timer
+		led_timer_handle = xTimerCreate("LED-Timer", duration, pdTRUE, NULL, led_toggle);
+
+		//start software timer
+		xTimerStart(led_timer_handle, portMAX_DELAY);
+
+	}else{
+
+		//start software timer
+		xTimerStart(led_timer_handle, portMAX_DELAY);
+	}
 }
 
 void led_toggle_stop(void){
 
 
+	xTimerStop(led_timer_handle, portMAX_DELAY);
 }
 
 void read_led_status(char *task_msg){
