@@ -154,6 +154,17 @@ void rtos_delay(uint32_t delay_in_ms){
 
 }
 
+void USART2_IRQHandler(void){
+
+	uint16_t data_byte;
+	if( USART_GetFlagStatus(USART2, USART_FLAG_RXNE)){
+
+		//a data byte is received from the user
+		data_byte = USART_ReceiveData(USART2);
+
+	}
+}
+
 static void prvSetupHardware(void){
 
 	//Setup Button and LED
@@ -226,8 +237,14 @@ static void prvSetupUart(void){
 	uart2_init.USART_WordLength = USART_WordLength_8b;
 	USART_Init(USART2, &uart2_init);
 
+	//Enable the UART interrupts
+	USART_ITConfig(USART2, USART_IT_RXNE, ENABLE);
+	NVIC_SetPriority(USART2_IRQn, 5);
+	NVIC_EnableIRQ(USART2_IRQn);
+
 	//Enable the UART2 peripheral
 	USART_Cmd(USART2, ENABLE);
+
 }
 
 void printmsg(char *msg){
