@@ -5188,7 +5188,7 @@ Discarded input sections
  .group         0x00000000        0xc src/main.o
  .group         0x00000000        0xc src/main.o
  .text          0x00000000        0x0 src/main.o
- .data          0x00000000        0x0 src/main.o
+ .data          0x00000000       0xac src/main.o
  .text.rtos_delay
                 0x00000000       0x40 src/main.o
  .debug_macro   0x00000000      0xa72 src/main.o
@@ -6157,7 +6157,7 @@ LOAD c:/ac6/systemworkbench/plugins/fr.ac6.mcu.externaltools.arm-none.win32_1.17
                 0x000004ca       0x22 c:/ac6/systemworkbench/plugins/fr.ac6.mcu.externaltools.arm-none.win32_1.17.0.201812190825/tools/compiler/bin/../lib/gcc/arm-none-eabi/7.3.1/thumb/v7e-m/fpv4-sp/hard/crtn.o
 OUTPUT(FreeRTIS-Queue.elf elf32-littlearm)
 
-.debug_info     0x00000000     0xae12
+.debug_info     0x00000000     0xae33
  .debug_info    0x00000000      0x62b StdPeriph_Driver/src/stm32f4xx_gpio.o
  .debug_info    0x0000062b      0xd6d StdPeriph_Driver/src/stm32f4xx_rcc.o
  .debug_info    0x00001398      0x9d4 StdPeriph_Driver/src/stm32f4xx_usart.o
@@ -6167,9 +6167,9 @@ OUTPUT(FreeRTIS-Queue.elf elf32-littlearm)
  .debug_info    0x00006f41     0x1407 Third-Party/FreeRTOS/org/Source/timers.o
  .debug_info    0x00008348      0x533 Third-Party/FreeRTOS/org/Source/portable/GCC/ARM_CM4F/port.o
  .debug_info    0x0000887b      0xbfc Third-Party/FreeRTOS/org/Source/portable/MemMang/heap_4.o
- .debug_info    0x00009477     0x13bb src/main.o
- .debug_info    0x0000a832      0x5be src/system_stm32f4xx.o
- .debug_info    0x0000adf0       0x22 startup/startup_stm32f411xe.o
+ .debug_info    0x00009477     0x13dc src/main.o
+ .debug_info    0x0000a853      0x5be src/system_stm32f4xx.o
+ .debug_info    0x0000ae11       0x22 startup/startup_stm32f411xe.o
 
 .debug_abbrev   0x00000000     0x1a78
  .debug_abbrev  0x00000000      0x1bf StdPeriph_Driver/src/stm32f4xx_gpio.o
@@ -6261,7 +6261,7 @@ OUTPUT(FreeRTIS-Queue.elf elf32-littlearm)
  .debug_macro   0x00002005      0x112 src/main.o
  .debug_macro   0x00002117      0x1a5 src/system_stm32f4xx.o
 
-.debug_line     0x00000000     0x649f
+.debug_line     0x00000000     0x64a0
  .debug_line    0x00000000      0x716 StdPeriph_Driver/src/stm32f4xx_gpio.o
  .debug_line    0x00000716      0x9a0 StdPeriph_Driver/src/stm32f4xx_rcc.o
  .debug_line    0x000010b6      0x85c StdPeriph_Driver/src/stm32f4xx_usart.o
@@ -6271,11 +6271,11 @@ OUTPUT(FreeRTIS-Queue.elf elf32-littlearm)
  .debug_line    0x00003f0d      0x899 Third-Party/FreeRTOS/org/Source/timers.o
  .debug_line    0x000047a6      0x68c Third-Party/FreeRTOS/org/Source/portable/GCC/ARM_CM4F/port.o
  .debug_line    0x00004e32      0x63f Third-Party/FreeRTOS/org/Source/portable/MemMang/heap_4.o
- .debug_line    0x00005471      0x9c8 src/main.o
- .debug_line    0x00005e39      0x5e7 src/system_stm32f4xx.o
- .debug_line    0x00006420       0x7f startup/startup_stm32f411xe.o
+ .debug_line    0x00005471      0x9c9 src/main.o
+ .debug_line    0x00005e3a      0x5e7 src/system_stm32f4xx.o
+ .debug_line    0x00006421       0x7f startup/startup_stm32f411xe.o
 
-.debug_str      0x00000000    0x6044e
+.debug_str      0x00000000    0x60453
  .debug_str     0x00000000    0x5309d StdPeriph_Driver/src/stm32f4xx_gpio.o
                               0x5329c (size before relaxing)
  .debug_str     0x0005309d      0xd09 StdPeriph_Driver/src/stm32f4xx_rcc.o
@@ -6294,11 +6294,11 @@ OUTPUT(FreeRTIS-Queue.elf elf32-littlearm)
                                0x8454 (size before relaxing)
  .debug_str     0x0005e8a9      0x249 Third-Party/FreeRTOS/org/Source/portable/MemMang/heap_4.o
                                0xaaad (size before relaxing)
- .debug_str     0x0005eaf2     0x187f src/main.o
-                              0x5c4a0 (size before relaxing)
- .debug_str     0x00060371       0xae src/system_stm32f4xx.o
+ .debug_str     0x0005eaf2     0x1884 src/main.o
+                              0x5c4a5 (size before relaxing)
+ .debug_str     0x00060376       0xae src/system_stm32f4xx.o
                               0x531bc (size before relaxing)
- .debug_str     0x0006041f       0x2f startup/startup_stm32f411xe.o
+ .debug_str     0x00060424       0x2f startup/startup_stm32f411xe.o
                                  0x62 (size before relaxing)
 
 .comment        0x00000000       0x7f

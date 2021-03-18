@@ -47,6 +47,17 @@ void rtos_delay(uint32_t delay_in_ms);
 uint8_t command_buffer[20];
 uint8_t command_len = 0;
 
+//Menu
+char menu[] = {"\
+\r\nLED_ON				--->1\
+\r\nLED_OFF				--->2\
+\r\nLED_TOGGLE			--->3\
+\r\nLED_TOGGLE_OFF		--->4\
+\r\nLED_READ_STATTUS	--->5\
+\r\nLRTC_PRINT_DATETIME	--->6\
+\r\nEXIT_APP			--->0\
+\r\nType your option here	"};
+
 //command structure
 typedef struct APP_CMD{
 
