@@ -122,21 +122,21 @@ int main(void)
 					"CMD handling",
 					500,
 					NULL,
-					1,
+					2,
 					&xTaskHandle2);
 
 		xTaskCreate(vTask3_cmd_processing,
 					"CMD processing",
 					500,
 					NULL,
-					1,
+					2,
 					&xTaskHandle3);
 
 		xTaskCreate(vTask4_uart_write,
 					"UART_write",
 					500,
 					NULL,
-					1,
+					2,
 					&xTaskHandle4);
 
 	}else{
