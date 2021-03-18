@@ -40,6 +40,7 @@ TaskHandle_t xTaskHandle4 = NULL;
 
 //Queue handle
 QueueHandle_t command_queue = NULL;
+QueueHandle_t uart_write_queue = NULL;
 
 void rtos_delay(uint32_t delay_in_ms);
 
@@ -70,7 +71,10 @@ int main(void)
 	//Create the command queue
 	command_queue = xQueueCreate(10, sizeof(APP_CMD_t*));
 
-	if ( command_queue != NULL){
+	//Create the write queue
+	uart_write_queue = xQueueCreate(10, sizeof(char*));
+
+	if ( (command_queue != NULL) && (uart_write_queue != NULL)){
 
 		//Create tasks
 		xTaskCreate(vTask1_menu_display,
