@@ -44,6 +44,9 @@ QueueHandle_t uart_write_queue = NULL;
 
 void rtos_delay(uint32_t delay_in_ms);
 
+uint8_t command_buffer[20];
+uint8_t command_len = 0;
+
 //command structure
 typedef struct APP_CMD{
 
@@ -154,6 +157,8 @@ void rtos_delay(uint32_t delay_in_ms){
 
 }
 
+
+
 void USART2_IRQHandler(void){
 
 	uint16_t data_byte;
@@ -162,6 +167,13 @@ void USART2_IRQHandler(void){
 		//a data byte is received from the user
 		data_byte = USART_ReceiveData(USART2);
 
+		command_buffer[command_len++] = data_byte & 0xFF;
+
+		if(data_byte == '\r'){
+
+			//notify the command handling task
+			xTaskNotify(xTaskHandle2, 0, eNoAction);
+		}
 	}
 }
 
